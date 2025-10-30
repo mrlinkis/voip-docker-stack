@@ -10,13 +10,13 @@ VoIP Docker Stack
 
 Установка
 
-1. Получите проприетарные компоненты у вашего менеджера
+1. Получите проприетарные компоненты c локальной шары
 2. Разместите папки в корне проекта:
-   - `CDR_sender/`
-   - `CDRs/`
-   - `telephony_service/`
-   - `freeswitch/`
-3. Запустите: `./deploy.sh`
+   - CDR_sender/
+   - CDRs/
+   - telephony_service/
+   - freeswitch/
+3. Запустите: ./deploy.sh
 
 Техническая реализация
 
