@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  freeswitch:
+    build: ./freeswitch
+    container_name: voip-freeswitch
+    network_mode: host  # можно заменить на ports + bridge
+    volumes:
+      - ./freeswitch/config/freeswitch.xml:/usr/local/freeswitch/conf/freeswitch.xml:ro
+      - ./freeswitch/config/autoload_configs/modules.conf.xml:/usr/local/freeswitch/conf/autoload_configs/modules.conf.xml:ro
+      - ./freeswitch/config/vars.xml:/usr/local/freeswitch/conf/vars.xml:ro
+      - ./freeswitch/config/autoload_configs/acl.conf.xml:/usr/local/freeswitch/conf/autoload_configs/acl.conf.xml:ro
+      - ./freeswitch/config/autoload_configs/event_socket.conf.xml:/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml:ro
+      - ./freeswitch/config/autoload_configs/logfile.conf.xml:/usr/local/freeswitch/conf/autoload_configs/logfile.conf.xml:ro
+      - ./freeswitch/config/sip_profiles/internal.xml:/usr/local/freeswitch/conf/sip_profiles/internal.xml:ro
+      - ./freeswitch/config/dialplan:/usr/local/freeswitch/conf/dialplan:ro
+    restart: unless-stopped
+
+  telservice:
+    build: ./telephony_service
+    container_name: voip-telservice
+    network_mode: host
+    volumes:
+      - ./telephony_service/logs:/opt/data/telephony_service/logs
+      - ./telephony_service/records:/opt/data/telephony_service/records
+      - ./telephony_service/config/ts.yaml:/opt/data/telephony_service/ts.yaml:ro
+      - ./telephony_service/ca-certificates:/opt/data/telephony_service/ca-certificates
+    restart: unless-stopped
+    depends_on:
+      - freeswitch
+
+  cdrsender:
+    image: cdr_sender:1.0.2.0
+    container_name: CDRSender
+    network_mode: host
+    volumes:
+      - ./cdr_sender/logs:/cdrsender/logs
+      - ./cdr_sender/config:/cdrsender/conf:ro
+      - ./cdr_sender/tmp:/cdrsender/cdrs
+    restart: always
